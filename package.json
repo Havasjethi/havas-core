@@ -1,0 +1,12 @@
+{
+  "name": "havas-core",
+  "version": "0.0.0",
+  "private": false,
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {},
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.3.5"
+  }
+}
