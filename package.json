@@ -7,7 +7,7 @@
   "scripts": {},
   "license": "ISC",
   "files": [
-    "lib/",
+    "lib/"
   ],
   "directories": {
     "lib": "lib",

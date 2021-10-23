@@ -1,3 +1,7 @@
+export interface Objectified<T> {
+  [name: string | number | symbol]: T;
+}
+
 export interface CoreRouter<Endpoint,
   MiddleWare,
   ErrorHandler,
@@ -7,7 +11,7 @@ export interface CoreRouter<Endpoint,
   parent: CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper> | undefined;
   children: CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper>[];
 
-  endpoints: Endpoint[];
+  endpoints: Objectified<Endpoint>;
 
   middlewares: MiddleWare[];
   errorHandlers: ErrorHandler[];
@@ -20,7 +24,7 @@ export interface CoreRouter<Endpoint,
 type AnyRouter = CoreRouter<any, any, any, any>;
 
 
-export abstract class BaseCoreRouter<Endpoint,
+export abstract class BaseCoreRouter<Endpoint extends {methodName: string},
   MiddleWare,
   ErrorHandler,
   ResultWrapper> implements CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper> {
@@ -28,35 +32,36 @@ export abstract class BaseCoreRouter<Endpoint,
   public path: string = '/';
   public parent: CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper> | undefined = undefined;
   public children: CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper>[] = [];
-  public endpoints: Endpoint[] = [];
+  public endpoints: {[name: string| number | symbol]: Endpoint} = {};
   public middlewares: MiddleWare[] = [];
   public errorHandlers: ErrorHandler[] = [];
   public resultWrapper: ResultWrapper | undefined;
   public defaultHandler: Endpoint | undefined;
 
   public add_child (child: AnyRouter) {
-    this.children.push(child);
-    child.parent = this;
+    return this.addChild(child);
   }
 
   public set_parent (parent: AnyRouter) {
-    this.parent = parent;
-    parent.children.push(this);
+    return this.addChild(parent);
   }
 
-  public addChild (child: AnyRouter) {
+  public addChild (child: AnyRouter): this {
     this.children.push(child);
     child.parent = this;
+    return this;
   }
 
-  public setParent (parent: AnyRouter) {
+  public setParent (parent: AnyRouter): this {
     this.parent = parent;
     parent.children.push(this);
+    return this;
   }
 
   public getResultWrapper (): ResultWrapper | undefined {
     let routerNode: AnyRouter | undefined = this;
     let resultWrapper: ResultWrapper | undefined;
+    let maxIteration = 100;
 
     do {
       if ((routerNode as AnyRouter).resultWrapper) {
@@ -65,22 +70,22 @@ export abstract class BaseCoreRouter<Endpoint,
         routerNode = this.parent;
       }
     }
-    while (resultWrapper === undefined && routerNode !== undefined);
+    while (maxIteration-- > 0 && resultWrapper === undefined && routerNode !== undefined);
 
     return resultWrapper;
   }
 
-  public registerEndpoint (endpoint: Endpoint) {
-    this.endpoints.push(endpoint);
-  }
+  // public registerEndpoint (endpoint: Endpoint) {
+  //   this.endpoints[endpoint.methodName] = endpoint;
+  // }
 
   public registerMiddleware (middleware: MiddleWare) {
     this.middlewares.push(middleware);
   }
 
-  public registerErrorHandler (errorHandler: ErrorHandler) {
-    this.errorHandlers.push(errorHandler);
-  }
+  // public registerErrorHandler (errorHandler: ErrorHandler) {
+  //   this.errorHandlers.push(errorHandler);
+  // }
 
   public registerResultWrapper (resultWrapper: ResultWrapper) {
     this.resultWrapper = resultWrapper;
