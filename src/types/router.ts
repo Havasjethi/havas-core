@@ -1,13 +1,11 @@
-export interface CoreRouter<Endpoint,
-  MiddleWare,
-  ErrorHandler,
-  ResultWrapper> {
+export interface CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper> {
   path: string;
 
   parent: CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper> | undefined;
   children: CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper>[];
 
-  endpoints: Endpoint[];
+  // endpoints: Endpoint[];
+  endpoints: { [name: string]: Endpoint };
 
   middlewares: MiddleWare[];
   errorHandlers: ErrorHandler[];
@@ -16,45 +14,72 @@ export interface CoreRouter<Endpoint,
   defaultHandler: Endpoint | undefined;
 }
 
-
 type AnyRouter = CoreRouter<any, any, any, any>;
 
+export type ResultWrapperTypeCallable = <
+  Req = unknown,
+  Res = unknown,
+  Next = unknown,
+  Result = unknown,
+>({
+  response,
+  request,
+  next,
+  result,
+}: {
+  response: Req;
+  request: Res;
+  next: Next;
+  result: Result;
+}) => any;
 
-export abstract class BaseCoreRouter<Endpoint,
+export abstract class BaseCoreRouter<
+  Endpoint extends { name: string },
   MiddleWare,
   ErrorHandler,
-  ResultWrapper> implements CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper> {
-
+  ResultWrapper,
+> implements CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper>
+{
   public path: string = '/';
-  public parent: CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper> | undefined = undefined;
+  public parent: CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper> | undefined =
+    undefined;
   public children: CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper>[] = [];
-  public endpoints: Endpoint[] = [];
+  // public endpoints: Endpoint[] = [];
+  public endpoints: { [name: string]: Endpoint } = {};
   public middlewares: MiddleWare[] = [];
   public errorHandlers: ErrorHandler[] = [];
   public resultWrapper: ResultWrapper | undefined;
   public defaultHandler: Endpoint | undefined;
 
-  public add_child (child: AnyRouter) {
+  public add_child(child: BaseCoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper>) {
     this.children.push(child);
     child.parent = this;
+
+    return this;
   }
 
-  public set_parent (parent: AnyRouter) {
+  public set_parent(parent: BaseCoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper>) {
     this.parent = parent;
     parent.children.push(this);
+
+    return this;
   }
 
-  public addChild (child: AnyRouter) {
+  public addChild(child: BaseCoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper>) {
     this.children.push(child);
     child.parent = this;
+
+    return this;
   }
 
-  public setParent (parent: AnyRouter) {
+  public setParent(parent: BaseCoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper>) {
     this.parent = parent;
     parent.children.push(this);
+
+    return this;
   }
 
-  public getResultWrapper (): ResultWrapper | undefined {
+  public getResultWrapper(): ResultWrapper | undefined {
     let routerNode: AnyRouter | undefined = this;
     let resultWrapper: ResultWrapper | undefined;
 
@@ -64,29 +89,28 @@ export abstract class BaseCoreRouter<Endpoint,
       } else {
         routerNode = this.parent;
       }
-    }
-    while (resultWrapper === undefined && routerNode !== undefined);
+    } while (resultWrapper === undefined && routerNode !== undefined);
 
     return resultWrapper;
   }
 
-  public registerEndpoint (endpoint: Endpoint) {
-    this.endpoints.push(endpoint);
-  }
+  // public registerEndpoint (endpoint: Endpoint) {
+  //   this.endpoints[endpoint.name] = endpoint;
+  // }
 
-  public registerMiddleware (middleware: MiddleWare) {
+  public registerMiddleware(middleware: MiddleWare) {
     this.middlewares.push(middleware);
   }
 
-  public registerErrorHandler (errorHandler: ErrorHandler) {
-    this.errorHandlers.push(errorHandler);
-  }
+  // public registerErrorHandler (errorHandler: ErrorHandler) {
+  //   this.errorHandlers.push(errorHandler);
+  // }
 
-  public registerResultWrapper (resultWrapper: ResultWrapper) {
+  public registerResultWrapper(resultWrapper: ResultWrapper) {
     this.resultWrapper = resultWrapper;
   }
 
-  public registerDefaultHandler(defaultHandler: Endpoint) {
-    this.defaultHandler = defaultHandler;
-  }
+  // public registerDefaultHandler (defaultHandler: Endpoint) {
+  //   this.defaultHandler = defaultHandler;
+  // }
 }

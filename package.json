@@ -1,17 +1,17 @@
 {
   "name": "havas-core",
-  "version": "0.0.0",
-  "private": true,
-  "description": "",
+  "version": "0.0.1",
+  "description": "Havas core pack",
   "main": "lib/index.js",
-  "scripts": {},
+  "scripts": {
+    "prepublish": "tsc"
+  },
   "license": "ISC",
   "files": [
-    "lib/",
+    "lib/"
   ],
   "directories": {
-    "lib": "lib",
-    "test": "tests"
+    "lib": "lib"
   },
   "devDependencies": {
     "typescript": "^4.3.5"
