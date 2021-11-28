@@ -9,7 +9,7 @@ export type HttpMethodType =
   | 'head';
 
 export interface DecoratedParameters {
-  index?: number;
+  index: number;
   name: string;
   arguments?: unknown[];
 }
