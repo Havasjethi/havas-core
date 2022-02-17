@@ -8,23 +8,21 @@ export type HttpMethodType =
   | 'options'
   | 'head';
 
-export interface DecoratedParameters {
+export interface DecoratedParameters<PostProcessorType> {
   index: number;
   name: string;
   arguments?: unknown[];
+  postProcessors?: PostProcessorType[];
 }
 
-export type PostProcessor<Input = unknown, Outout = unknown> = (value: Input) => Outout;
+export type PostProcessor<Input = unknown, Output = unknown> = (value: Input) => Output;
 
-export interface RegistrableMethod {
+export interface RegistrableMethod<PP> {
   methodName: string;
-  parameters: DecoratedParameters[];
-  postProcessors?: {
-    [parameterIndex: number]: PostProcessor[];
-  };
+  parameters: DecoratedParameters<PP>[];
 }
 
-export interface CoreEndpoint extends RegistrableMethod {
+export interface CoreEndpoint<PostProcessorType = PostProcessor> extends RegistrableMethod<PostProcessorType> {
   methodType: HttpMethodType;
   path: string;
 }

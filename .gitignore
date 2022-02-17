@@ -3,5 +3,6 @@ package-lock.json
 tsconfig.tsbuildinfo
 
 # Folders
+.idea
 node_modules/
 lib/
