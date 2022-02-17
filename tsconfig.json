@@ -4,7 +4,6 @@
     "node_modules"
   ],
   "compilerOptions": {
-    "incremental": true,
     "target": "es5",
     "module": "commonjs",
     "declaration": true,

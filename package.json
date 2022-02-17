@@ -1,8 +1,8 @@
 {
   "name": "havas-core",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "Havas-web's core package",
-  "main": "lib/index.js",
+  "main": "src/index.ts",
   "scripts": {
     "prepublish": "tsc"
   },
