@@ -1,6 +1,5 @@
 # Files
 package-lock.json
-tsconfig.tsbuildinfo
 
 # Folders
 .idea
