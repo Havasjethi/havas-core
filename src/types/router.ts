@@ -5,7 +5,9 @@ export interface Objectified<T> {
 export interface CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper> {
   path: string;
 
-  parent: CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper> | undefined;
+  parent:
+    | CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper>
+    | undefined;
   children: CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper>[];
 
   endpoints: Objectified<Endpoint>;
@@ -23,7 +25,7 @@ export type ResultWrapperTypeCallable = <
   Req = unknown,
   Res = unknown,
   Next = unknown,
-  Result = unknown,
+  Result = unknown
 >({
   response,
   request,
@@ -40,13 +42,19 @@ export abstract class BaseCoreRouter<
   Endpoint extends { methodName: string },
   MiddleWare,
   ErrorHandler,
-  ResultWrapper,
+  ResultWrapper
 > implements CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper>
 {
-  public path: string = '/';
-  public parent: CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper> | undefined =
-    undefined;
-  public children: CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper>[] = [];
+  public path: string = "/";
+  public parent:
+    | CoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper>
+    | undefined = undefined;
+  public children: CoreRouter<
+    Endpoint,
+    MiddleWare,
+    ErrorHandler,
+    ResultWrapper
+  >[] = [];
   public endpoints: { [name in string | number | symbol]: Endpoint } = {};
   public middlewares: MiddleWare[] = [];
   public errorHandlers: ErrorHandler[] = [];
@@ -68,14 +76,16 @@ export abstract class BaseCoreRouter<
     return this;
   }
 
-  public setParent(parent: BaseCoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper>) {
+  public setParent(
+    parent: BaseCoreRouter<Endpoint, MiddleWare, ErrorHandler, ResultWrapper>
+  ) {
     this.parent = parent;
     parent.children.push(this);
 
     return this;
   }
 
-  public getResultWrapper(): ResultWrapper | undefined {
+  public getResultWrapper(): [ResultWrapper, AnyRouter] | undefined {
     let routerNode: AnyRouter | undefined = this;
     let resultWrapper: ResultWrapper | undefined;
     let maxIteration = 100;
@@ -86,9 +96,13 @@ export abstract class BaseCoreRouter<
       } else {
         routerNode = this.parent;
       }
-    } while (maxIteration-- > 0 && resultWrapper === undefined && routerNode !== undefined);
+    } while (
+      maxIteration-- > 0 &&
+      resultWrapper === undefined &&
+      routerNode !== undefined
+    );
 
-    return resultWrapper;
+    return resultWrapper ? [resultWrapper, routerNode!] : undefined;
   }
 
   // public registerEndpoint (endpoint: Endpoint) {
