@@ -1,10 +1,11 @@
 {
   "name": "havas-core",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Havas-web's core package",
   "main": "lib/index.js",
   "scripts": {
-    "prepublish": "tsc"
+    "build": "tsc",
+    "prepublish": "npm run build"
   },
   "license": "ISC",
   "files": [
