@@ -1,3 +1,5 @@
+import { UniversalPostProcessor } from '../post_processors';
+
 export type HttpMethodType =
   | 'all'
   | 'get'
@@ -15,14 +17,14 @@ export interface DecoratedParameters<PostProcessorType> {
   postProcessors?: PostProcessorType[];
 }
 
-export type PostProcessor<Input = unknown, Output = unknown> = (value: Input) => Output;
-
 export interface RegistrableMethod<PP> {
   methodName: string;
+  // TODO :: Update this to contecrete type () A -> B  | A -> B, B -> C | ...
   parameters: DecoratedParameters<PP>[];
 }
 
-export interface CoreEndpoint<PostProcessorType = PostProcessor> extends RegistrableMethod<PostProcessorType> {
+export interface CoreEndpoint<PostProcessorType = UniversalPostProcessor>
+  extends RegistrableMethod<PostProcessorType> {
   methodType: HttpMethodType;
   path: string;
 }

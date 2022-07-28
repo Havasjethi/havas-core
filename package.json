@@ -16,5 +16,8 @@
   },
   "devDependencies": {
     "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "uniqid": "^5.4.0"
   }
 }
